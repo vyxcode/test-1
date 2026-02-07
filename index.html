@@ -178,6 +178,8 @@ let lastSwitch = 0;
 function drawOrbit(alpha) {
   const cx = canvas.width / 2;
   const cy = canvas.height / 2;
+  const isLightMode = document.documentElement.classList.contains('light-mode');
+  const lightness = isLightMode ? '30%' : '60%'; // Darker particles for light mode
 
   for (let i = 0; i < 200; i++) {
     const angle = i * 0.15 + t;
@@ -187,7 +189,7 @@ function drawOrbit(alpha) {
     const y = cy + Math.sin(angle) * radius;
 
     const hue = (t * 50 + i * 3) % 360;
-    ctx.fillStyle = `hsla(${hue},100%,60%,${alpha})`;
+    ctx.fillStyle = `hsla(${hue},100%,${lightness},${alpha})`;
 
     ctx.beginPath();
     ctx.arc(x, y, 2, 0, Math.PI * 2);
@@ -203,6 +205,8 @@ let fx = 0.1, fy = 0.1;
 function drawFractal(alpha) {
   const cx = canvas.width / 2;
   const cy = canvas.height / 2;
+  const isLightMode = document.documentElement.classList.contains('light-mode');
+  const lightness = isLightMode ? '25%' : '55%'; // Darker particles for light mode
 
   for (let i = 0; i < 400; i++) {
     const nx = Math.sin(fy * 3) + Math.cos(t * 0.7);
@@ -215,7 +219,7 @@ function drawFractal(alpha) {
     const y = cy + fy * cy * 0.8;
 
     const hue = (t * 80 + i) % 360;
-    ctx.fillStyle = `hsla(${hue},80%,55%,${alpha})`;
+    ctx.fillStyle = `hsla(${hue},80%,${lightness},${alpha})`;
 
     ctx.fillRect(x, y, 1.5, 1.5);
   }
