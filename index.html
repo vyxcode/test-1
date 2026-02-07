@@ -230,7 +230,8 @@ function drawFractal(alpha) {
 ===================== */
 function animate(time) {
   // 잔상
-  ctx.fillStyle = "rgba(0,0,0,0.15)";
+  const isLightMode = document.documentElement.classList.contains('light-mode');
+  ctx.fillStyle = isLightMode ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.15)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // 10초마다 모드 전환
