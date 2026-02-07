@@ -132,6 +132,7 @@ function switchTheme(e) {
     document.documentElement.className = '';
     localStorage.setItem('theme', '');
   }
+  clearCanvasForTheme();
 }
 
 toggleSwitch.addEventListener('change', switchTheme, false);
@@ -223,6 +224,12 @@ function drawFractal(alpha) {
 
     ctx.fillRect(x, y, 1.5, 1.5);
   }
+}
+
+function clearCanvasForTheme() {
+  const isLightMode = document.documentElement.classList.contains('light-mode');
+  ctx.fillStyle = isLightMode ? "#ffffff" : "#000000";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 /* =====================
