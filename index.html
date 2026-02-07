@@ -4,14 +4,31 @@
   <meta charset="UTF-8" />
   <title>Animated Fractal Clock</title>
   <style>
+    :root {
+      --bg-color: black;
+      --text-color: white;
+      --clock-shadow: rgba(255,255,255,0.6);
+      --toggle-bg: #333;
+      --toggle-handle: white;
+      --toggle-border: #555;
+    }
+    .light-mode {
+      --bg-color: white;
+      --text-color: black;
+      --clock-shadow: rgba(0,0,0,0.4);
+      --toggle-bg: #ccc;
+      --toggle-handle: #333;
+      --toggle-border: #999;
+    }
     html, body {
       margin: 0;
       padding: 0;
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: black;
+      background: var(--bg-color);
       font-family: Arial, sans-serif;
+      transition: background 0.5s ease; /* Smooth transition for background */
     }
     canvas {
       position: fixed;
@@ -23,20 +40,103 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      color: white;
+      color: var(--text-color);
       font-size: 64px;
       letter-spacing: 2px;
-      text-shadow: 0 0 20px rgba(255,255,255,0.6);
+      text-shadow: 0 0 20px var(--clock-shadow);
       z-index: 10;
+      transition: color 0.5s ease, text-shadow 0.5s ease; /* Smooth transition for clock */
+    }
+    /* Theme Toggle Switch */
+    .theme-switch-wrapper {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+    }
+    .theme-switch {
+      display: inline-block;
+      height: 34px;
+      position: relative;
+      width: 60px;
+    }
+    .theme-switch input {
+      display:none;
+    }
+    .slider {
+      background-color: var(--toggle-bg);
+      border: 1px solid var(--toggle-border);
+      bottom: 0;
+      cursor: pointer;
+      left: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      transition: .4s;
+    }
+    .slider:before {
+      background-color: var(--toggle-handle);
+      bottom: 4px;
+      content: "";
+      height: 26px;
+      left: 4px;
+      position: absolute;
+      transition: .4s;
+      width: 26px;
+    }
+    input:checked + .slider {
+      background-color: var(--toggle-bg);
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    /* Rounded sliders */
+    .slider.round {
+      border-radius: 34px;
+    }
+    .slider.round:before {
+      border-radius: 50%;
     }
   </style>
 </head>
 <body>
+<div class="theme-switch-wrapper">
+  <label class="theme-switch" for="checkbox">
+    <input type="checkbox" id="checkbox" />
+    <div class="slider round"></div>
+  </label>
+</div>
 
 <canvas id="bg"></canvas>
 <div id="clock"></div>
 
 <script>
+/* =====================
+   Theme Switcher
+===================== */
+const toggleSwitch = document.getElementById('checkbox');
+const currentTheme = localStorage.getItem('theme');
+
+if (currentTheme) {
+  document.documentElement.className = currentTheme;
+  if (currentTheme === 'light-mode') {
+    toggleSwitch.checked = true;
+  }
+}
+
+function switchTheme(e) {
+  if (e.target.checked) {
+    document.documentElement.className = 'light-mode';
+    localStorage.setItem('theme', 'light-mode');
+  } else {
+    document.documentElement.className = '';
+    localStorage.setItem('theme', '');
+  }
+}
+
+toggleSwitch.addEventListener('change', switchTheme, false);
+
+
 /* =====================
    Canvas 설정
 ===================== */
