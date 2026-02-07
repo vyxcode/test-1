@@ -1,14 +1,152 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
-  <link href='/style.css' rel='stylesheet'>
+  <title>Animated Fractal Clock</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: black;
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+    #clock {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 64px;
+      letter-spacing: 2px;
+      text-shadow: 0 0 20px rgba(255,255,255,0.6);
+      z-index: 10;
+    }
+  </style>
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <button onclick="console.log('hello');">Press me</button>
-  <script defer type="text/javascript" src="/main.js"></script>
+
+<canvas id="bg"></canvas>
+<div id="clock"></div>
+
+<script>
+/* =====================
+   Canvas 설정
+===================== */
+const canvas = document.getElementById("bg");
+const ctx = canvas.getContext("2d");
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resize);
+resize();
+
+/* =====================
+   시계
+===================== */
+const clock = document.getElementById("clock");
+function updateClock() {
+  const d = new Date();
+  clock.textContent =
+    String(d.getHours()).padStart(2,"0") + ":" +
+    String(d.getMinutes()).padStart(2,"0") + ":" +
+    String(d.getSeconds()).padStart(2,"0");
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+/* =====================
+   애니메이션 상태
+===================== */
+let t = 0;
+let mode = 0;        // 0 = orbit, 1 = fractal
+let modeBlend = 0;  // 0 → 1 부드러운 전환
+let lastSwitch = 0;
+
+/* =====================
+   Orbit 모드
+===================== */
+function drawOrbit(alpha) {
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+
+  for (let i = 0; i < 200; i++) {
+    const angle = i * 0.15 + t;
+    const radius = 120 + Math.sin(t + i) * 80;
+
+    const x = cx + Math.cos(angle) * radius;
+    const y = cy + Math.sin(angle) * radius;
+
+    const hue = (t * 50 + i * 3) % 360;
+    ctx.fillStyle = `hsla(${hue},100%,60%,${alpha})`;
+
+    ctx.beginPath();
+    ctx.arc(x, y, 2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+/* =====================
+   Fractal 모드
+===================== */
+let fx = 0.1, fy = 0.1;
+
+function drawFractal(alpha) {
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+
+  for (let i = 0; i < 400; i++) {
+    const nx = Math.sin(fy * 3) + Math.cos(t * 0.7);
+    const ny = Math.sin(fx * 3) + Math.sin(t * 0.5);
+
+    fx = nx * 0.6;
+    fy = ny * 0.6;
+
+    const x = cx + fx * cx * 0.8;
+    const y = cy + fy * cy * 0.8;
+
+    const hue = (t * 80 + i) % 360;
+    ctx.fillStyle = `hsla(${hue},80%,55%,${alpha})`;
+
+    ctx.fillRect(x, y, 1.5, 1.5);
+  }
+}
+
+/* =====================
+   메인 루프
+===================== */
+function animate(time) {
+  // 잔상
+  ctx.fillStyle = "rgba(0,0,0,0.15)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // 10초마다 모드 전환
+  if (time - lastSwitch > 10000) {
+    mode = 1 - mode;
+    lastSwitch = time;
+  }
+
+  // 블렌딩
+  modeBlend += (mode - modeBlend) * 0.02;
+
+  drawOrbit(1 - modeBlend);
+  drawFractal(modeBlend);
+
+  t += 0.01;
+  requestAnimationFrame(animate);
+}
+
+animate(0);
+</script>
+
 </body>
 </html>
